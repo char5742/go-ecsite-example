@@ -2,10 +2,16 @@ name: Test
 
 on:
   push:
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/ci.yml'
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
@@ -17,6 +23,8 @@ jobs:
           version: v1.60
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    needs: lint
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
