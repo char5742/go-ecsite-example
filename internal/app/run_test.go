@@ -1,3 +1,5 @@
+//go:build medium
+
 package app
 
 import (
