@@ -6,5 +6,9 @@
         {
             "file": ".vscode/copilot-commit-message-instructions.md"
         },
-    ]
+    ],
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "*.go": "${capture}.go, ${capture}_test.go"
+    }
 }
