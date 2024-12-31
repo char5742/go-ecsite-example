@@ -1,0 +1,10 @@
+name: ecsite-sample
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      target: deploy
+    ports:
+      - "8050:8050"
+    tty: true
