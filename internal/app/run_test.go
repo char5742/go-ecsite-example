@@ -14,13 +14,13 @@ func TestRun(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		return run(ctx)
+		return Run(ctx)
 	})
 
 	in := "message"
 	cfg := config.LoadConfig()
 	addr := "http://localhost:" + cfg.Port
-	rsp, err := http.Get(addr + in)
+	rsp, err := http.Get(addr + "/" + in)
 	if err != nil {
 		t.Errorf("Error making GET request: %v", err)
 	}

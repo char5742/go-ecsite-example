@@ -10,14 +10,15 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func run(ctx context.Context) error {
+func Run(ctx context.Context) error {
 	cfg := config.GetConfig()
 	s := &http.Server{
-		Addr: cfg.Port,
+		Addr: ":" + cfg.Port,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
 		}),
 	}
+
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
