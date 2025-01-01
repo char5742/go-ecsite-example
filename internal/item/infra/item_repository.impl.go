@@ -3,7 +3,6 @@ package infra
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"char5742/ecsite-sample/internal/item/domain"
 	"char5742/ecsite-sample/internal/share/infra/db"
@@ -105,87 +104,6 @@ func (t *ItemRepositoryImpl) Save(ctx context.Context, item *domain.Item) error 
 	if _, err := t.conn.ExecContext(ctx, query, args...); err != nil {
 		err = fmt.Errorf("failed to save item: %w", err)
 		return err
-	}
-	return nil
-}
-
-func insertGender(ctx context.Context, conn *db.DatabaseConnection, g *domain.Gender) error {
-	account := ctx.Value("account").(string)
-	query := `
-		INSERT INTO
-			id,
-			name,
-			created_at,
-			created_by,
-			update_at,
-			update_by
-		VALUES (?, ?, ?, ?, ?, ?)
-	`
-	args := []interface{}{
-		g.ID,
-		g.Name,
-		time.Now(),
-		account,
-		time.Now(),
-		account,
-	}
-
-	if _, err := conn.ExecContext(ctx, query, args...); err != nil {
-		return fmt.Errorf("failed to save Gender: %w", err)
-	}
-	return nil
-}
-
-func insertBreed(ctx context.Context, conn *db.DatabaseConnection, b *domain.Breed) error {
-	account := ctx.Value("account").(string)
-	query := `
-		INSERT INTO
-			id,
-			name,
-			created_at,
-			created_by,
-			update_at,
-			update_by
-		VALUES (?, ?, ?, ?, ?, ?)
-	`
-	args := []interface{}{
-		b.ID,
-		b.Name,
-		time.Now(),
-		account,
-		time.Now(),
-		account,
-	}
-
-	if _, err := conn.ExecContext(ctx, query, args...); err != nil {
-		return fmt.Errorf("failed to save Breed: %w", err)
-	}
-	return nil
-}
-
-func insertColor(ctx context.Context, conn *db.DatabaseConnection, c *domain.Color) error {
-	account := ctx.Value("account").(string)
-	query := `
-		INSERT INTO
-			id,
-			name,
-			created_at,
-			created_by,
-			update_at,
-			update_by
-		VALUES (?, ?, ?, ?, ?, ?)
-	`
-	args := []interface{}{
-		c.ID,
-		c.Name,
-		time.Now(),
-		account,
-		time.Now(),
-		account,
-	}
-
-	if _, err := conn.ExecContext(ctx, query, args...); err != nil {
-		return fmt.Errorf("failed to save Color: %w", err)
 	}
 	return nil
 }

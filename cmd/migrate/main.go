@@ -14,9 +14,15 @@ func main() {
 	m := db.OpenMigrate(conn.Conn, "file://db/migrations")
 	defer m.Close()
 	if args == "up" {
-		m.Up()
+		if err := m.Up(); err != nil {
+			panic(err)
+		}
 	} else if args == "down" {
-		m.Down()
+		if err := m.Down(); err != nil {
+			panic(err)
+		}
+	} else {
+		panic("invalid argument error")
 	}
 	os.Exit(0)
 }

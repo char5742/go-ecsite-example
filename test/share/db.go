@@ -65,7 +65,9 @@ func OpenDBForTest() *sql.DB {
 	}
 
 	m := db.OpenMigrate(tdb, "file://../../../db/migrations")
-	m.Up()
+	if err := m.Up(); err != nil {
+		log.Fatalf("failed to migrate: %v", err)
+	}
 	return tdb
 }
 

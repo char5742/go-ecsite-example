@@ -132,11 +132,10 @@ func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, condition u
 
 	// Price
 	if condition.PriceCond != nil {
-		q, a, newIndex := buildPriceCondition(*condition.PriceCond, placeHolderIndex)
+		q, a, _ := buildPriceCondition(*condition.PriceCond, placeHolderIndex)
 		if q != "" {
 			conds = append(conds, q)
 			args = append(args, a...)
-			placeHolderIndex = newIndex
 		}
 	}
 
