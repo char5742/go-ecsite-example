@@ -3,6 +3,12 @@
 # 変数定義
 APP_NAME := char5742/go-ecsite-sample
 DOCKER_TAG := latest
+MIGRATE_TOOL := github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+DB_HOST := localhost
+DB_PORT := 5435
+DB_USER := postgres
+DB_PASSWORD := postgres
+DB_NAME := app
 
 # タスク定義
 .PHONY: all clean build run test
@@ -35,6 +41,19 @@ test:
 lint:
 	golangci-lint run
 
+# マイグレーション用のファイルを作成
+# name: バージョン名
+db-migrate-create:
+	go run ${MIGRATE_TOOL} create -ext sql -dir db/migrations -seq $(name)
+
+# マイグレーションを実行
+db-migrate-up:
+	go run cmd/migrate/main.go up
+
+# マイグレーションを戻す
+db-migrate-down:
+	go run cmd/migrate/main.go down
+
 
 # ヘルプ
 help:
@@ -47,4 +66,7 @@ help:
 	@echo '  test         テストを実行します'
 	@echo '  lint         静的解析を実行します'
 	@echo '  help         ヘルプを表示します'
+	@echo '  db-migrate-create  マイグレーションファイルを作成します'
+	@echo '  db-migrate-up      マイグレーションを実行します'
+	@echo '  db-migrate-down    マイグレーションを戻します'
 	@echo ''
