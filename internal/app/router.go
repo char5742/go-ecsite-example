@@ -1,9 +1,8 @@
 package app
 
 import (
+	"char5742/ecsite-sample/internal/item"
 	"net/http"
-
-	"github.com/char5742/ecsite-sample/internal/item"
 )
 
 func NewMux() *http.ServeMux {

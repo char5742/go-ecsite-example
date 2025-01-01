@@ -6,8 +6,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/char5742/ecsite-sample/internal/app"
-	"github.com/char5742/ecsite-sample/pkg/config"
+	"char5742/ecsite-sample/internal/app"
+	"char5742/ecsite-sample/pkg/config"
 )
 
 func main() {

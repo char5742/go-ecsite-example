@@ -12,10 +12,10 @@ type Config struct {
 	DebugMode bool   `env:"DEBUG_MODE" envDefault:"false"`
 	Database  struct {
 		Host     string `env:"DB_HOST" envDefault:"localhost"`
-		Port     int    `env:"DB_PORT" envDefault:"5432"`
-		User     string `env:"DB_USER" envDefault:"user"`
-		Password string `env:"DB_PASSWORD"`
-		Name     string `env:"DB_NAME" envDefault:"app_db"`
+		Port     string `env:"DB_PORT" envDefault:"5435"`
+		User     string `env:"DB_USER" envDefault:"postgres"`
+		Password string `env:"DB_PASSWORD" envDefault:"postgres"`
+		Name     string `env:"DB_NAME" envDefault:"app"`
 	}
 }
 
@@ -29,5 +29,8 @@ func LoadConfig() *Config {
 }
 
 func GetConfig() *Config {
+	if cfg.AppName == "" {
+		LoadConfig()
+	}
 	return &cfg
 }
