@@ -5,7 +5,6 @@ package medium_test
 import (
 	"char5742/ecsite-sample/internal/item/domain"
 	"char5742/ecsite-sample/internal/item/infra"
-	"char5742/ecsite-sample/internal/share/infra/db"
 	"char5742/ecsite-sample/test/share"
 	"context"
 	"testing"
@@ -17,15 +16,23 @@ func TestItemRepository_Read(t *testing.T) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "account", "00000000-0000-0000-0000-000000000000")
 
-	conn := db.NewDatabaseConnection(tdb)
+	tx, err := tdb.BeginTx(ctx, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			t.Fatalf("rollback failed: %v", err)
+		}
+	}()
 
 	// 切り出したSQLファイルを実行
-	share.ExecSQLFile(t, "sql/init-read.sql", tdb)
+	share.ExecSQLFile(t, ctx, "sql/init-read.sql", tx)
 
 	// ここから先は元のテストと同じ
-	repo := infra.NewItemRepositoryImpl(conn)
+	repo := infra.NewItemRepositoryImpl()
 
-	item, err := repo.Read(ctx, domain.NewItemID("44444444-4444-4444-4444-444444444444"))
+	item, err := repo.Read(ctx, tx, domain.NewItemID("44444444-4444-4444-4444-444444444444"))
 	if err != nil {
 		t.Fatalf("unexpected error calling Read: %v", err)
 	}

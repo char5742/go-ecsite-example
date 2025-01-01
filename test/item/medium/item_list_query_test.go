@@ -8,36 +8,52 @@ import (
 
 	"char5742/ecsite-sample/internal/item/infra"
 	"char5742/ecsite-sample/internal/item/usecase"
-	"char5742/ecsite-sample/internal/share/infra/db"
 	"char5742/ecsite-sample/test/share"
 )
 
 func TestItemListQueryImpl_ItemList(t *testing.T) {
 	ctx := context.Background()
 
-	conn := db.NewDatabaseConnection(tdb)
+	tx, err := tdb.BeginTx(ctx, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			t.Fatalf("rollback failed: %v", err)
+		}
+	}()
 
 	// 切り出したSQLファイルを実行
-	share.ExecSQLFile(t, "sql/init-list-query.sql", tdb)
+	share.ExecSQLFile(t, ctx, "sql/init-list-query.sql", tx)
 
 	// ここから先は元のテストと同じ
-	itemListQuery := infra.NewItemListQueryImpl(conn)
+	itemListQuery := infra.NewItemListQueryImpl()
 
-	items, err := itemListQuery.ItemList(ctx)
+	items, err := itemListQuery.ItemList(ctx, tx)
 	if err != nil {
 		t.Fatalf("unexpected error calling ItemList: %v", err)
 	}
 
-	if len(items) != 6 {
-		t.Errorf("expected 2 items, got %d", len(items))
+	if len(items) != 8 {
+		t.Errorf("expected 8 items, got %d", len(items))
 	}
 }
 
 func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 	ctx := context.Background()
-	conn := db.NewDatabaseConnection(tdb)
-	share.ExecSQLFile(t, "sql/init-list-query.sql", tdb)
-	itemListQuery := infra.NewItemListQueryImpl(conn)
+	tx, err := tdb.BeginTx(ctx, nil)
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			t.Fatalf("rollback failed: %v", err)
+		}
+	}()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	share.ExecSQLFile(t, ctx, "sql/init-list-query.sql", tx)
+	itemListQuery := infra.NewItemListQueryImpl()
 
 	t.Run("Case1: Gender=Male, Breed=Bulldog, Color=Brown, Price=0..15000", func(t *testing.T) {
 		cond := usecase.ItemListCondition{
@@ -55,7 +71,7 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Max: 15000,
 			},
 		}
-		items, err := itemListQuery.ItemListByCondition(ctx, cond)
+		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -80,7 +96,7 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Max: 15000,
 			},
 		}
-		items, err := itemListQuery.ItemListByCondition(ctx, cond)
+		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -106,7 +122,7 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Max: 40000,
 			},
 		}
-		items, err := itemListQuery.ItemListByCondition(ctx, cond)
+		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -132,7 +148,7 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Max: 15000,
 			},
 		}
-		items, err := itemListQuery.ItemListByCondition(ctx, cond)
+		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -158,7 +174,7 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Max: 10000,
 			},
 		}
-		items, err := itemListQuery.ItemListByCondition(ctx, cond)
+		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -184,7 +200,7 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Max: 10000,
 			},
 		}
-		items, err := itemListQuery.ItemListByCondition(ctx, cond)
+		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -210,7 +226,7 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Max: 99999,
 			},
 		}
-		items, err := itemListQuery.ItemListByCondition(ctx, cond)
+		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

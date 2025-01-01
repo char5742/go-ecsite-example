@@ -1,6 +1,7 @@
 -- accounts
 INSERT INTO accounts (id)
 VALUES ('00000000-0000-0000-0000-000000000000');
+SET app.account_id = '00000000-0000-0000-0000-000000000000';
 -- genders
 INSERT INTO genders (id, name, created_by, updated_by)
 VALUES (
