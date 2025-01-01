@@ -2,24 +2,23 @@ package infra
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"char5742/ecsite-sample/internal/item/domain"
-	"char5742/ecsite-sample/internal/share/infra/db"
 )
 
 type ItemRepositoryImpl struct {
-	conn *db.DatabaseConnection
 }
 
 // インターフェース実装用のコンストラクタ
-func NewItemRepositoryImpl(conn *db.DatabaseConnection) domain.ItemRepository {
-	return &ItemRepositoryImpl{conn: conn}
+func NewItemRepositoryImpl() domain.ItemRepository {
+	return &ItemRepositoryImpl{}
 }
 
 // Read は指定された ID の Item を取得します。
 // 指定された ID の Item が存在しない場合は `sql.ErrNoRows` を返却します。
-func (t *ItemRepositoryImpl) Read(ctx context.Context, id domain.ItemID) (*domain.Item, error) {
+func (t *ItemRepositoryImpl) Read(ctx context.Context, tx *sql.Tx, id domain.ItemID) (*domain.Item, error) {
 	query := `
 		SELECT
 			items.id,
@@ -45,7 +44,7 @@ func (t *ItemRepositoryImpl) Read(ctx context.Context, id domain.ItemID) (*domai
 			items.id = $1
 	`
 	args := []interface{}{id}
-	row := t.conn.QueryRowContext(ctx, query, args...)
+	row := tx.QueryRowContext(ctx, query, args...)
 	var item domain.Item
 	if err := row.Scan(
 		&item.ID,
@@ -65,7 +64,7 @@ func (t *ItemRepositoryImpl) Read(ctx context.Context, id domain.ItemID) (*domai
 	return &item, nil
 }
 
-func (t *ItemRepositoryImpl) Save(ctx context.Context, item *domain.Item) error {
+func (t *ItemRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, item *domain.Item) error {
 	query := `
 		INSERT INTO items (
 			id,
@@ -101,7 +100,7 @@ func (t *ItemRepositoryImpl) Save(ctx context.Context, item *domain.Item) error 
 		ctx.Value("account"),
 	}
 
-	if _, err := t.conn.ExecContext(ctx, query, args...); err != nil {
+	if _, err := tx.ExecContext(ctx, query, args...); err != nil {
 		err = fmt.Errorf("failed to save item: %w", err)
 		return err
 	}

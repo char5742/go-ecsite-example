@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"sync"
@@ -12,23 +11,15 @@ import (
 	_ "github.com/lib/pq" // ドライバのインポート
 )
 
-type DatabaseConnection struct {
-	Conn *sql.DB
-}
-
 var (
-	dbConn   *DatabaseConnection
+	db       *sql.DB
 	initOnce sync.Once
 	initErr  error
 )
 
-func NewDatabaseConnection(conn *sql.DB) *DatabaseConnection {
-	return &DatabaseConnection{Conn: conn}
-}
-
 // GetDBConn はスレッドセーフでシングルトンの DatabaseConnection を返します。
 // 初回呼び出し時のみ接続を確立し、エラーがあれば呼び出し元に返します。
-func OpenDB() (*DatabaseConnection, error) {
+func OpenDB() (*sql.DB, error) {
 	initOnce.Do(func() {
 		db, err := open()
 		if err != nil {
@@ -47,10 +38,9 @@ func OpenDB() (*DatabaseConnection, error) {
 		db.SetMaxIdleConns(5)
 		db.SetConnMaxLifetime(time.Hour)
 
-		dbConn = &DatabaseConnection{Conn: db}
 	})
 
-	return dbConn, initErr
+	return db, initErr
 }
 
 // open は config から取得した設定をもとにデータベースへ接続し、*sql.DB を返します。
@@ -72,54 +62,42 @@ func open() (*sql.DB, error) {
 	return db, nil
 }
 
-func (c *DatabaseConnection) Close() error {
-	return c.Conn.Close()
-}
+// func (c *DatabaseConnection) Rollback(tx *sql.Tx) error {
+// 	return tx.Rollback()
+// }
 
-func (c *DatabaseConnection) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
-	tx, err := c.Conn.BeginTx(ctx, opts)
-	if err != nil {
-		return nil, fmt.Errorf("failed to begin transaction: %w", err)
-	}
-	return tx, nil
-}
+// func (c *DatabaseConnection) Commit(tx *sql.Tx) error {
+// 	return tx.Commit()
+// }
 
-func (c *DatabaseConnection) Rollback(tx *sql.Tx) error {
-	return tx.Rollback()
-}
+// func (c *DatabaseConnection) PrepareContext(ctx context.Context, query string) (*sql.Stmt, error) {
+// 	return c.Conn.PrepareContext(ctx, query)
+// }
 
-func (c *DatabaseConnection) Commit(tx *sql.Tx) error {
-	return tx.Commit()
-}
+// func (c *DatabaseConnection) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
+// 	return c.Conn.ExecContext(ctx, query, args...)
+// }
 
-func (c *DatabaseConnection) PrepareContext(ctx context.Context, query string) (*sql.Stmt, error) {
-	return c.Conn.PrepareContext(ctx, query)
-}
+// func (c *DatabaseConnection) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
+// 	return c.Conn.QueryContext(ctx, query, args...)
+// }
 
-func (c *DatabaseConnection) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
-	return c.Conn.ExecContext(ctx, query, args...)
-}
+// func (c *DatabaseConnection) QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row {
+// 	return c.Conn.QueryRowContext(ctx, query, args...)
+// }
 
-func (c *DatabaseConnection) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
-	return c.Conn.QueryContext(ctx, query, args...)
-}
+// func (c *DatabaseConnection) SetMaxOpenConns(n int) {
+// 	c.Conn.SetMaxOpenConns(n)
+// }
 
-func (c *DatabaseConnection) QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row {
-	return c.Conn.QueryRowContext(ctx, query, args...)
-}
+// func (c *DatabaseConnection) SetMaxIdleConns(n int) {
+// 	c.Conn.SetMaxIdleConns(n)
+// }
 
-func (c *DatabaseConnection) SetMaxOpenConns(n int) {
-	c.Conn.SetMaxOpenConns(n)
-}
+// func (c *DatabaseConnection) SetConnMaxLifetime(d time.Duration) {
+// 	c.Conn.SetConnMaxLifetime(d)
+// }
 
-func (c *DatabaseConnection) SetMaxIdleConns(n int) {
-	c.Conn.SetMaxIdleConns(n)
-}
-
-func (c *DatabaseConnection) SetConnMaxLifetime(d time.Duration) {
-	c.Conn.SetConnMaxLifetime(d)
-}
-
-func (c *DatabaseConnection) Ping() error {
-	return c.Conn.Ping()
-}
+// func (c *DatabaseConnection) Ping() error {
+// 	return c.Conn.Ping()
+// }

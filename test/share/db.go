@@ -71,12 +71,12 @@ func OpenDBForTest() *sql.DB {
 	return tdb
 }
 
-func ExecSQLFile(t *testing.T, path string, dbConn *sql.DB) {
+func ExecSQLFile(t *testing.T, ctx context.Context, path string, tx *sql.Tx) {
 	sqlBytes, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("failed to read sql file: %v", err)
 	}
-	if _, err := dbConn.Exec(string(sqlBytes)); err != nil {
+	if _, err := tx.ExecContext(ctx, string(sqlBytes)); err != nil {
 		t.Fatalf("failed to exec sql file: %v", err)
 	}
 }

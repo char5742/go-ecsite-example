@@ -2,24 +2,23 @@ package infra
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strings"
 
 	"char5742/ecsite-sample/internal/item/domain"
 	"char5742/ecsite-sample/internal/item/usecase"
-	"char5742/ecsite-sample/internal/share/infra/db"
 )
 
 type ItemListQueryImpl struct {
-	conn *db.DatabaseConnection
 }
 
 // インターフェース実装用のコンストラクタ
-func NewItemListQueryImpl(conn *db.DatabaseConnection) usecase.ItemListQuery {
-	return &ItemListQueryImpl{conn: conn}
+func NewItemListQueryImpl() usecase.ItemListQuery {
+	return &ItemListQueryImpl{}
 }
 
-func (t *ItemListQueryImpl) ItemList(ctx context.Context) ([]*domain.Item, error) {
+func (t *ItemListQueryImpl) ItemList(ctx context.Context, tx *sql.Tx) ([]*domain.Item, error) {
 	query := `
 		SELECT
 			items.id,
@@ -43,7 +42,7 @@ func (t *ItemListQueryImpl) ItemList(ctx context.Context) ([]*domain.Item, error
 			colors ON items.color_id = colors.id
 	`
 
-	rows, err := t.conn.QueryContext(ctx, query)
+	rows, err := tx.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +75,7 @@ func (t *ItemListQueryImpl) ItemList(ctx context.Context) ([]*domain.Item, error
 	return items, nil
 }
 
-func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, condition usecase.ItemListCondition) ([]*domain.Item, error) {
+func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx *sql.Tx, condition usecase.ItemListCondition) ([]*domain.Item, error) {
 	baseQuery := `
 		SELECT
 			i.id,
@@ -144,7 +143,7 @@ func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, condition u
 		baseQuery += " AND " + strings.Join(conds, " AND ")
 	}
 
-	rows, err := t.conn.QueryContext(ctx, baseQuery, args...)
+	rows, err := tx.QueryContext(ctx, baseQuery, args...)
 	if err != nil {
 		return nil, err
 	}

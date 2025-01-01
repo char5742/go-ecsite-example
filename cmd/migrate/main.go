@@ -11,7 +11,7 @@ func main() {
 		panic(err)
 	}
 	args := os.Args[1]
-	m := db.OpenMigrate(conn.Conn, "file://db/migrations")
+	m := db.OpenMigrate(conn, "file://db/migrations")
 	defer m.Close()
 	if args == "up" {
 		if err := m.Up(); err != nil {

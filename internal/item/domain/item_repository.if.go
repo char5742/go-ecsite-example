@@ -1,8 +1,11 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"database/sql"
+)
 
 type ItemRepository interface {
-	Read(ctx context.Context, id ItemID) (*Item, error)
-	Save(ctx context.Context, item *Item) error
+	Read(ctx context.Context, tx *sql.Tx, id ItemID) (*Item, error)
+	Save(ctx context.Context, tx *sql.Tx, item *Item) error
 }

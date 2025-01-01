@@ -2,15 +2,16 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 
 	"char5742/ecsite-sample/internal/item/domain"
 )
 
 type ItemListQuery interface {
 	// 商品一覧を取得する
-	ItemList(ctx context.Context) ([]*domain.Item, error)
+	ItemList(ctx context.Context, tx *sql.Tx) ([]*domain.Item, error)
 	// 条件に合致する商品一覧を取得する
-	ItemListByCondition(ctx context.Context, condition ItemListCondition) ([]*domain.Item, error)
+	ItemListByCondition(ctx context.Context, tx *sql.Tx, condition ItemListCondition) ([]*domain.Item, error)
 }
 
 // 商品一覧取得条件
