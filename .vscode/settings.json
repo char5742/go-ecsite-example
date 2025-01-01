@@ -1,6 +1,12 @@
 {
     "cSpell.words": [
-        "errgroup"
+        "conds",
+        "ecsite",
+        "errgroup",
+        "golangci",
+        "ossp",
+        "testcontainers",
+        "usecase"
     ],
     "github.copilot.chat.commitMessageGeneration.instructions": [
         {
@@ -10,5 +16,13 @@
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
         "*.go": "${capture}.go, ${capture}_test.go"
-    }
+    },
+    "workbench.editor.customLabels.patterns": {
+        "**/*.go": "${dirname}/${filename}.${extname} .../${dirname(1)}",
+      },
+      "go.testTags": "small,medium,large",
+      "go.buildFlags": [
+        "-tags",
+        "small,medium,large"
+      ],
 }
