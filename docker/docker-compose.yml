@@ -8,5 +8,14 @@ services:
     ports:
       - "8050:8050"
     environment:
-      - PORT: 8050
+      PORT: 8050
     tty: true
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
