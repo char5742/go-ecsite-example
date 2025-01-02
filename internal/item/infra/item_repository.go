@@ -2,10 +2,10 @@ package infra
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	"char5742/ecsite-sample/internal/item/domain"
+	"char5742/ecsite-sample/pkg/db"
 )
 
 type ItemRepository struct {
@@ -18,7 +18,7 @@ func NewItemRepository() *ItemRepository {
 
 // Read は指定された ID の Item を取得します。
 // 指定された ID の Item が存在しない場合は `sql.ErrNoRows` を返却します。
-func (t *ItemRepository) Read(ctx context.Context, tx *sql.Tx, id domain.ItemID) (*domain.Item, error) {
+func (t *ItemRepository) Read(ctx context.Context, tx db.TX, id domain.ItemID) (*domain.Item, error) {
 	query := `
 		SELECT
 			items.id,
@@ -26,6 +26,7 @@ func (t *ItemRepository) Read(ctx context.Context, tx *sql.Tx, id domain.ItemID)
 			items.price,
 			items.birthday,
 			items.image,
+			items.is_deleted,
 			genders.id AS gender_id,
 			genders.name AS gender_name,
 			breeds.id AS breed_id,
@@ -52,6 +53,7 @@ func (t *ItemRepository) Read(ctx context.Context, tx *sql.Tx, id domain.ItemID)
 		&item.Price,
 		&item.Birthday,
 		&item.Image,
+		&item.IsDeleted,
 		&item.Gender.ID,
 		&item.Gender.Name,
 		&item.Breed.ID,
@@ -64,7 +66,7 @@ func (t *ItemRepository) Read(ctx context.Context, tx *sql.Tx, id domain.ItemID)
 	return &item, nil
 }
 
-func (t *ItemRepository) Save(ctx context.Context, tx *sql.Tx, item *domain.Item) error {
+func (t *ItemRepository) Save(ctx context.Context, tx db.TX, item *domain.Item) error {
 	query := `
 		INSERT INTO items (
 			id,
@@ -72,12 +74,11 @@ func (t *ItemRepository) Save(ctx context.Context, tx *sql.Tx, item *domain.Item
 			price,
 			birthday,
 			image,
+			is_deleted,
 			gender_id,
 			breed_id,
 			color_id,
-			created_by,
-			update_by
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		ON CONFLICT (id) DO UPDATE SET
 			description = $2,
 			price = $3,
@@ -86,7 +87,6 @@ func (t *ItemRepository) Save(ctx context.Context, tx *sql.Tx, item *domain.Item
 			gender_id = $6,
 			breed_id = $7,
 			color_id = $8,
-			update_by = $10
 	`
 	args := []interface{}{
 		item.ID,
@@ -94,10 +94,10 @@ func (t *ItemRepository) Save(ctx context.Context, tx *sql.Tx, item *domain.Item
 		item.Price,
 		item.Birthday,
 		item.Image,
+		item.IsDeleted,
 		item.Gender.ID,
 		item.Breed.ID,
 		item.Color.ID,
-		ctx.Value("account"),
 	}
 
 	if _, err := tx.ExecContext(ctx, query, args...); err != nil {

@@ -1,23 +1,29 @@
+//go:generate mockgen -source=$GOFILE -destination=mock_$GOFILE -package=$GOPACKAGE
 package infra
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"strings"
 
 	"char5742/ecsite-sample/internal/item/domain"
+	"char5742/ecsite-sample/pkg/db"
 )
 
-type ItemListQuery struct {
+type ItemListQuery interface {
+	ItemList(ctx context.Context, tx db.TX) ([]domain.Item, error)
+	ItemListByCondition(ctx context.Context, tx db.TX, condition ItemListCondition) ([]domain.Item, error)
+}
+
+type ItemListQueryImpl struct {
 }
 
 // インターフェース実装用のコンストラクタ
-func NewItemListQuery() *ItemListQuery {
-	return &ItemListQuery{}
+func NewItemListQuery() ItemListQuery {
+	return &ItemListQueryImpl{}
 }
 
-func (t *ItemListQuery) ItemList(ctx context.Context, tx *sql.Tx) ([]*domain.Item, error) {
+func (t *ItemListQueryImpl) ItemList(ctx context.Context, tx db.TX) ([]domain.Item, error) {
 	query := `
 		SELECT
 			items.id,
@@ -25,6 +31,7 @@ func (t *ItemListQuery) ItemList(ctx context.Context, tx *sql.Tx) ([]*domain.Ite
 			items.price,
 			items.birthday,
 			items.image,
+			items.is_deleted,
 			genders.id AS gender_id,
 			genders.name AS gender_name,
 			breeds.id AS breed_id,
@@ -47,7 +54,7 @@ func (t *ItemListQuery) ItemList(ctx context.Context, tx *sql.Tx) ([]*domain.Ite
 	}
 	defer rows.Close()
 
-	var items []*domain.Item
+	var items []domain.Item
 	for rows.Next() {
 		var item domain.Item
 		if err := rows.Scan(
@@ -56,6 +63,7 @@ func (t *ItemListQuery) ItemList(ctx context.Context, tx *sql.Tx) ([]*domain.Ite
 			&item.Price,
 			&item.Birthday,
 			&item.Image,
+			&item.IsDeleted,
 			&item.Gender.ID,
 			&item.Gender.Name,
 			&item.Breed.ID,
@@ -65,7 +73,7 @@ func (t *ItemListQuery) ItemList(ctx context.Context, tx *sql.Tx) ([]*domain.Ite
 		); err != nil {
 			return nil, err
 		}
-		items = append(items, &item)
+		items = append(items, item)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -105,7 +113,7 @@ type PriceCondition struct {
 	Max int
 }
 
-func (t *ItemListQuery) ItemListByCondition(ctx context.Context, tx *sql.Tx, condition ItemListCondition) ([]*domain.Item, error) {
+func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx db.TX, condition ItemListCondition) ([]domain.Item, error) {
 	baseQuery := `
 		SELECT
 			i.id,
@@ -113,6 +121,7 @@ func (t *ItemListQuery) ItemListByCondition(ctx context.Context, tx *sql.Tx, con
 			i.price,
 			i.birthday,
 			i.image,
+			i.is_deleted,
 			g.id AS gender_id,
 			g.name AS gender_name,
 			b.id AS breed_id,
@@ -179,7 +188,7 @@ func (t *ItemListQuery) ItemListByCondition(ctx context.Context, tx *sql.Tx, con
 	}
 	defer rows.Close()
 
-	var items []*domain.Item
+	var items []domain.Item
 	for rows.Next() {
 		var item domain.Item
 		if err := rows.Scan(
@@ -188,6 +197,7 @@ func (t *ItemListQuery) ItemListByCondition(ctx context.Context, tx *sql.Tx, con
 			&item.Price,
 			&item.Birthday,
 			&item.Image,
+			&item.IsDeleted,
 			&item.Gender.ID,
 			&item.Gender.Name,
 			&item.Breed.ID,
@@ -197,7 +207,7 @@ func (t *ItemListQuery) ItemListByCondition(ctx context.Context, tx *sql.Tx, con
 		); err != nil {
 			return nil, err
 		}
-		items = append(items, &item)
+		items = append(items, item)
 	}
 
 	if err := rows.Err(); err != nil {
