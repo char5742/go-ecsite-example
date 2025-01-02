@@ -9,6 +9,8 @@ services:
       - "8050:8050"
     environment:
       PORT: 8050
+      DB_HOST: db
+      DB_PORT: 5432
     tty: true
   db:
     image: postgres:17
