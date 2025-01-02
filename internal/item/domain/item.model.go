@@ -37,6 +37,8 @@ type Item struct {
 	Birthday time.Time
 	// 画像パス
 	Image string
+	// 削除フラグ
+	IsDeleted bool
 	// 性別
 	Gender Gender
 	// 種別
@@ -124,6 +126,7 @@ func NewItem(id ItemID, description string, price int, birthday time.Time, image
 		Price:       price,
 		Birthday:    birthday,
 		Image:       image,
+		IsDeleted:   false,
 		Gender:      gender,
 		Breed:       breed,
 		Color:       color,
