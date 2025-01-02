@@ -3,7 +3,7 @@
 # 変数定義
 APP_NAME := char5742/go-ecsite-sample
 DOCKER_TAG := latest
-MIGRATE_TOOL := github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+MIGRATE_TOOL := github.com/み/migrate/v4/cmd/migrate@latest
 DB_HOST := localhost
 DB_PORT := 5435
 DB_USER := postgres
@@ -41,6 +41,11 @@ test:
 lint:
 	golangci-lint run
 
+# 生成
+# 現状はmockの生成のみ
+generate:
+	go generate ./...
+
 # マイグレーション用のファイルを作成
 # name: バージョン名
 db-migrate-create:
@@ -65,6 +70,7 @@ help:
 	@echo '  stop         Dockerコンテナを停止します'
 	@echo '  test         テストを実行します'
 	@echo '  lint         静的解析を実行します'
+	@echo '  generate     生成を実行します'
 	@echo '  help         ヘルプを表示します'
 	@echo '  db-migrate-create  マイグレーションファイルを作成します'
 	@echo '  db-migrate-up      マイグレーションを実行します'
