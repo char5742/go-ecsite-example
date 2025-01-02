@@ -35,8 +35,16 @@ type DB interface {
 	OpenMigrate(sourceUrl string) *migrate.Migrate
 }
 
-func (db *DBImpl) BeginTx(ctx context.Context, opts *sql.TxOptions) (TX, error) {
-	tx, err := db.DB.BeginTx(ctx, opts)
+type DBImpl struct {
+	*sql.DB
+}
+
+func NewDB(db *sql.DB) DB {
+	return &DBImpl{db}
+}
+
+func (t *DBImpl) BeginTx(ctx context.Context, opts *sql.TxOptions) (TX, error) {
+	tx, err := t.DB.BeginTx(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -46,16 +54,8 @@ func (db *DBImpl) OpenMigrate(sourceUrl string) *migrate.Migrate {
 	return OpenMigrate(db.DB, sourceUrl)
 }
 
-type DBImpl struct {
-	*sql.DB
-}
-
-func NewDB(db *sql.DB) DB {
-	return &DBImpl{db}
-}
-
 var (
-	db       *sql.DB
+	conn     *sql.DB
 	initOnce sync.Once
 	initErr  error
 )
@@ -64,26 +64,26 @@ var (
 // 初回呼び出し時のみ接続を確立し、エラーがあれば呼び出し元に返します。
 func OpenDB() (DB, error) {
 	initOnce.Do(func() {
-		db, err := open()
+		_conn, err := open()
 		if err != nil {
 			initErr = fmt.Errorf("failed to open database: %w", err)
 			return
 		}
 
 		// 接続確認
-		if err := db.Ping(); err != nil {
+		if err := _conn.Ping(); err != nil {
 			initErr = fmt.Errorf("failed to ping database: %w", err)
 			return
 		}
+		conn = _conn
 
 		// コネクションプール設定（必要に応じて値を調整）
-		db.SetMaxOpenConns(10)
-		db.SetMaxIdleConns(5)
-		db.SetConnMaxLifetime(time.Hour)
+		conn.SetMaxOpenConns(10)
+		conn.SetMaxIdleConns(5)
+		conn.SetConnMaxLifetime(time.Hour)
 
 	})
-
-	return NewDB(db), initErr
+	return NewDB(conn), initErr
 }
 
 // open は config から取得した設定をもとにデータベースへ接続し、*sql.DB を返します。
