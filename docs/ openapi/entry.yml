@@ -1,0 +1,521 @@
+openapi: "3.1.0"
+info:
+  title: "ec_202404b API"
+  description: "ec_202404b API"
+  version: "1.0.0"
+servers:
+  - url: "https://ec_202404b"
+paths:
+  /img/{name}:
+    get:
+      summary: "GET img/{name}"
+      operationId: "img"
+      parameters:
+        - name: "name"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            image/jpeg:
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+                  format: "byte"
+  /showDetail/:
+    get:
+      summary: "GET showDetail/"
+      operationId: "showDetailPage"
+      parameters:
+        - name: "id"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/authentication/login:
+    post:
+      summary: "POST api/authentication/login"
+      operationId: "login"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/confirm/finalize:
+    post:
+      summary: "POST api/confirm/finalize"
+      operationId: "finalized"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestInfo"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/shoppingCart/getShoppingCart:
+    post:
+      summary: "POST api/shoppingCart/getShoppingCart"
+      operationId: "showShoppingCart"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetShoppingCartDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/shoppingCart/addItem:
+    post:
+      summary: "POST api/shoppingCart/addItem"
+      operationId: "addItem"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddItemDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/shoppingCart/deleteItem:
+    post:
+      summary: "POST api/shoppingCart/deleteItem"
+      operationId: "delete"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteItemDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/getItemList/search:
+    post:
+      summary: "POST api/getItemList/search"
+      operationId: "search"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/getItemList/page:
+    post:
+      summary: "POST api/getItemList/page"
+      operationId: "getPage"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PagingRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/getItemList/:
+    get:
+      summary: "GET api/getItemList/"
+      operationId: "getAllItem"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/getUser:
+    get:
+      summary: "GET api/getUser"
+      operationId: "getUserInfo"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+  /api/register:
+    post:
+      summary: "POST api/register"
+      operationId: "registerUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistrationDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+    get:
+      summary: "GET api/register"
+      operationId: "showCreatePage"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+components:
+  schemas:
+    LoginDto:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+        password:
+          type: "string"
+        anonymous:
+          type: "string"
+    FinalizeOrderDto:
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+        name:
+          type: "string"
+        email:
+          type: "string"
+        zipcode:
+          type: "string"
+        prefecture:
+          type: "string"
+        municipalities:
+          type: "string"
+        address:
+          type: "string"
+        telephone:
+          type: "string"
+        deliveryDate:
+          type: "string"
+        deliveryTime:
+          type: "string"
+        paymentMethod:
+          type: "string"
+        OrderItemIdList:
+          type: "array"
+          items:
+            type: "string"
+    PaymentInfoDTO:
+      type: "object"
+      properties:
+        user_id:
+          type: "string"
+        order_number:
+          type: "string"
+        amount:
+          type: "integer"
+          format: "int32"
+        card_number:
+          type: "string"
+        card_exp_year:
+          type: "integer"
+          format: "int32"
+        card_exp_month:
+          type: "integer"
+          format: "int32"
+        card_name:
+          type: "string"
+        card_cvv:
+          type: "string"
+    RequestInfo:
+      type: "object"
+      properties:
+        form:
+          $ref: "#/components/schemas/FinalizeOrderDto"
+        paymentInfo:
+          $ref: "#/components/schemas/PaymentInfoDTO"
+    GetShoppingCartDto:
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+    AddItemDto:
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+        itemId:
+          type: "string"
+        optionIdList:
+          type: "array"
+          items:
+            type: "string"
+    DeleteItemDto:
+      type: "object"
+      properties:
+        orderItemId:
+          type: "string"
+    SearchDto:
+      type: "object"
+      properties:
+        maxPrice:
+          type: "string"
+        minPrice:
+          type: "string"
+        colorList:
+          type: "array"
+          items:
+            type: "string"
+        breed:
+          type: "string"
+    PageRequestDto:
+      type: "object"
+      properties:
+        currentPage:
+          type: "integer"
+          format: "int32"
+        perPage:
+          type: "integer"
+          format: "int32"
+    PagingRequest:
+      type: "object"
+      properties:
+        search:
+          $ref: "#/components/schemas/SearchDto"
+        page:
+          $ref: "#/components/schemas/PageRequestDto"
+    Instant:
+      type: "object"
+      properties: { }
+    Breed:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    Color:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    Item:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        description:
+          type: "string"
+        price:
+          type: "integer"
+          format: "int32"
+        image:
+          type: "string"
+        gender:
+          type: "string"
+        birthDay:
+          type: "string"
+          format: "date"
+        deleted:
+          type: "boolean"
+        breed:
+          $ref: "#/components/schemas/Breed"
+        color:
+          $ref: "#/components/schemas/Color"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    Option:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        price:
+          type: "integer"
+          format: "int32"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    OrderItem:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        item:
+          $ref: "#/components/schemas/Item"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+        options:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Option"
+    Order:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        userId:
+          type: "string"
+          format: "uuid"
+        status:
+          type: "string"
+          enum:
+            - "BEFORE_ORDER"
+            - "UNPAID"
+            - "PAID"
+            - "SHIPPED"
+            - "DELIVERED"
+            - "CANCELLED"
+        totalPrice:
+          type: "integer"
+          format: "int32"
+        orderDate:
+          type: "string"
+          format: "date"
+        destinationName:
+          type: "string"
+        destinationEmail:
+          type: "string"
+        destinationZipcode:
+          type: "string"
+        destinationPrefecture:
+          type: "string"
+        destinationMunicipalities:
+          type: "string"
+        destinationAddress:
+          type: "string"
+        destinationTel:
+          type: "string"
+        deliveryDate:
+          type: "string"
+          format: "date"
+        timeRange:
+          type: "string"
+          enum:
+            - "RANGE_8_10"
+            - "RANGE_10_12"
+            - "RANGE_12_14"
+            - "RANGE_14_16"
+            - "RANGE_16_18"
+        paymentMethod:
+          type: "string"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+        orderItems:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/OrderItem"
+    UserInfo:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        email:
+          type: "string"
+        zipcode:
+          type: "string"
+        prefecture:
+          type: "string"
+        municipalities:
+          type: "string"
+        address:
+          type: "string"
+        telephone:
+          type: "string"
+        orderHistory:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Order"
+    UserRegistrationDto:
+      type: "object"
+      properties:
+        firstName:
+          type: "string"
+        lastName:
+          type: "string"
+        email:
+          type: "string"
+        password:
+          type: "string"
+        confirmPassword:
+          type: "string"
+        zipcode:
+          type: "string"
+        prefecture:
+          type: "string"
+        municipalities:
+          type: "string"
+        address:
+          type: "string"
+        telephone:
+          type: "string"
