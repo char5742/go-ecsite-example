@@ -1,7 +1,7 @@
 package main
 
 import (
-	"char5742/ecsite-sample/internal/share/infra/db"
+	"char5742/ecsite-sample/pkg/db"
 	"os"
 )
 
@@ -11,7 +11,7 @@ func main() {
 		panic(err)
 	}
 	args := os.Args[1]
-	m := db.OpenMigrate(conn, "file://db/migrations")
+	m := conn.OpenMigrate("file://db/migrations")
 	defer m.Close()
 	if args == "up" {
 		if err := m.Up(); err != nil {
