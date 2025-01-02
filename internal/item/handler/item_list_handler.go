@@ -30,7 +30,6 @@ func (h *ItemListHandlerImpl) Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	defer tx.Commit()
 	items, err := h.query.ItemList(ctx, tx)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
