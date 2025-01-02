@@ -3,7 +3,11 @@
         "conds",
         "ecsite",
         "errgroup",
+        "GOFILE",
         "golangci",
+        "gomock",
+        "GOPACKAGE",
+        "mockgen",
         "ossp",
         "testcontainers",
         "usecase"
@@ -15,7 +19,7 @@
     ],
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
-        "*.go": "${capture}.go, ${capture}_test.go"
+        "*.go": "${capture}.go, ${capture}_test.go, mock_${capture}.go"
     },
     "workbench.editor.customLabels.patterns": {
         "**/*.go": "${dirname}/${filename}.${extname} .../${dirname(1)}",
