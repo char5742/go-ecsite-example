@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"char5742/ecsite-sample/internal/item/infra"
-	"char5742/ecsite-sample/internal/item/usecase"
 	"char5742/ecsite-sample/test/share"
 )
 
@@ -28,7 +27,7 @@ func TestItemListQueryImpl_ItemList(t *testing.T) {
 	share.ExecSQLFile(t, ctx, "sql/init-list-query.sql", tx)
 
 	// ここから先は元のテストと同じ
-	itemListQuery := infra.NewItemListQueryImpl()
+	itemListQuery := infra.NewItemListQuery()
 
 	items, err := itemListQuery.ItemList(ctx, tx)
 	if err != nil {
@@ -53,20 +52,20 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 	}
 
 	share.ExecSQLFile(t, ctx, "sql/init-list-query.sql", tx)
-	itemListQuery := infra.NewItemListQueryImpl()
+	itemListQuery := infra.NewItemListQuery()
 
 	t.Run("Case1: Gender=Male, Breed=Bulldog, Color=Brown, Price=0..15000", func(t *testing.T) {
-		cond := usecase.ItemListCondition{
-			GenderCond: &usecase.GenderCondition{
+		cond := infra.ItemListCondition{
+			GenderCond: &infra.GenderCondition{
 				GenderIDList: []string{"11111111-1111-1111-1111-111111111111"},
 			},
-			BreedCond: &usecase.BreedCondition{
+			BreedCond: &infra.BreedCondition{
 				BreedIDList: []string{"33333333-3333-3333-3333-333333333333"},
 			},
-			ColorCond: &usecase.ColorCondition{
+			ColorCond: &infra.ColorCondition{
 				ColorIDList: []string{"55555555-5555-5555-5555-555555555555"},
 			},
-			PriceCond: &usecase.PriceCondition{
+			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 15000,
 			},
@@ -81,17 +80,17 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 	})
 
 	t.Run("Case2: Gender=Male, Breed=Golden Retriever, Color=White, Price=0..15000", func(t *testing.T) {
-		cond := usecase.ItemListCondition{
-			GenderCond: &usecase.GenderCondition{
+		cond := infra.ItemListCondition{
+			GenderCond: &infra.GenderCondition{
 				GenderIDList: []string{"11111111-1111-1111-1111-111111111111"},
 			},
-			BreedCond: &usecase.BreedCondition{
+			BreedCond: &infra.BreedCondition{
 				BreedIDList: []string{"BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"},
 			},
-			ColorCond: &usecase.ColorCondition{
+			ColorCond: &infra.ColorCondition{
 				ColorIDList: []string{"66666666-6666-6666-6666-666666666666"},
 			},
-			PriceCond: &usecase.PriceCondition{
+			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 15000,
 			},
@@ -107,17 +106,17 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 	})
 
 	t.Run("Case3: Gender=Female, Breed=Shiba Inu, Color=Black, Price=0..40000", func(t *testing.T) {
-		cond := usecase.ItemListCondition{
-			GenderCond: &usecase.GenderCondition{
+		cond := infra.ItemListCondition{
+			GenderCond: &infra.GenderCondition{
 				GenderIDList: []string{"22222222-2222-2222-2222-222222222222"},
 			},
-			BreedCond: &usecase.BreedCondition{
+			BreedCond: &infra.BreedCondition{
 				BreedIDList: []string{"CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"},
 			},
-			ColorCond: &usecase.ColorCondition{
+			ColorCond: &infra.ColorCondition{
 				ColorIDList: []string{"DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD"},
 			},
-			PriceCond: &usecase.PriceCondition{
+			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 40000,
 			},
@@ -133,17 +132,17 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 	})
 
 	t.Run("Case4: Gender=Undefined, Breed=Poodle, Color=White, Price=0..15000", func(t *testing.T) {
-		cond := usecase.ItemListCondition{
-			GenderCond: &usecase.GenderCondition{
+		cond := infra.ItemListCondition{
+			GenderCond: &infra.GenderCondition{
 				GenderIDList: []string{"AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"},
 			},
-			BreedCond: &usecase.BreedCondition{
+			BreedCond: &infra.BreedCondition{
 				BreedIDList: []string{"44444444-4444-4444-4444-444444444444"},
 			},
-			ColorCond: &usecase.ColorCondition{
+			ColorCond: &infra.ColorCondition{
 				ColorIDList: []string{"66666666-6666-6666-6666-666666666666"},
 			},
-			PriceCond: &usecase.PriceCondition{
+			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 15000,
 			},
@@ -159,17 +158,17 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 	})
 
 	t.Run("Case5: Gender=Male, Breed=Shiba Inu, Color=Golden, Price=0..10000 (範囲外データのみ存在)", func(t *testing.T) {
-		cond := usecase.ItemListCondition{
-			GenderCond: &usecase.GenderCondition{
+		cond := infra.ItemListCondition{
+			GenderCond: &infra.GenderCondition{
 				GenderIDList: []string{"11111111-1111-1111-1111-111111111111"},
 			},
-			BreedCond: &usecase.BreedCondition{
+			BreedCond: &infra.BreedCondition{
 				BreedIDList: []string{"CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"},
 			},
-			ColorCond: &usecase.ColorCondition{
+			ColorCond: &infra.ColorCondition{
 				ColorIDList: []string{"EEEEEEEE-EEEE-EEEE-EEEE-EEEEEEEEEEEE"},
 			},
-			PriceCond: &usecase.PriceCondition{
+			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 10000,
 			},
@@ -185,17 +184,17 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 	})
 
 	t.Run("Case6: Gender=Unknown, Breed=Bulldog, Color=Brown, Price=0..10000", func(t *testing.T) {
-		cond := usecase.ItemListCondition{
-			GenderCond: &usecase.GenderCondition{
+		cond := infra.ItemListCondition{
+			GenderCond: &infra.GenderCondition{
 				GenderIDList: []string{"99999999-9999-9999-9999-999999999999"},
 			},
-			BreedCond: &usecase.BreedCondition{
+			BreedCond: &infra.BreedCondition{
 				BreedIDList: []string{"33333333-3333-3333-3333-333333333333"},
 			},
-			ColorCond: &usecase.ColorCondition{
+			ColorCond: &infra.ColorCondition{
 				ColorIDList: []string{"55555555-5555-5555-5555-555555555555"},
 			},
-			PriceCond: &usecase.PriceCondition{
+			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 10000,
 			},
@@ -211,17 +210,17 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 	})
 
 	t.Run("Case7: Gender=Female, Breed=Golden Retriever, Color=Golden, Price=0..99999", func(t *testing.T) {
-		cond := usecase.ItemListCondition{
-			GenderCond: &usecase.GenderCondition{
+		cond := infra.ItemListCondition{
+			GenderCond: &infra.GenderCondition{
 				GenderIDList: []string{"22222222-2222-2222-2222-222222222222"},
 			},
-			BreedCond: &usecase.BreedCondition{
+			BreedCond: &infra.BreedCondition{
 				BreedIDList: []string{"BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"},
 			},
-			ColorCond: &usecase.ColorCondition{
+			ColorCond: &infra.ColorCondition{
 				ColorIDList: []string{"EEEEEEEE-EEEE-EEEE-EEEE-EEEEEEEEEEEE"},
 			},
-			PriceCond: &usecase.PriceCondition{
+			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 99999,
 			},

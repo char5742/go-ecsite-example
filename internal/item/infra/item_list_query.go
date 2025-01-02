@@ -7,18 +7,17 @@ import (
 	"strings"
 
 	"char5742/ecsite-sample/internal/item/domain"
-	"char5742/ecsite-sample/internal/item/usecase"
 )
 
-type ItemListQueryImpl struct {
+type ItemListQuery struct {
 }
 
 // インターフェース実装用のコンストラクタ
-func NewItemListQueryImpl() usecase.ItemListQuery {
-	return &ItemListQueryImpl{}
+func NewItemListQuery() *ItemListQuery {
+	return &ItemListQuery{}
 }
 
-func (t *ItemListQueryImpl) ItemList(ctx context.Context, tx *sql.Tx) ([]*domain.Item, error) {
+func (t *ItemListQuery) ItemList(ctx context.Context, tx *sql.Tx) ([]*domain.Item, error) {
 	query := `
 		SELECT
 			items.id,
@@ -75,7 +74,38 @@ func (t *ItemListQueryImpl) ItemList(ctx context.Context, tx *sql.Tx) ([]*domain
 	return items, nil
 }
 
-func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx *sql.Tx, condition usecase.ItemListCondition) ([]*domain.Item, error) {
+// 商品一覧取得条件
+type ItemListCondition struct {
+	// 性別
+	GenderCond *GenderCondition
+	// 種別
+	BreedCond *BreedCondition
+	// 色
+	ColorCond *ColorCondition
+	// 価格
+	PriceCond *PriceCondition
+}
+
+type GenderCondition struct {
+	GenderIDList []string
+}
+
+type BreedCondition struct {
+	BreedIDList []string
+}
+
+type ColorCondition struct {
+	ColorIDList []string
+}
+
+type PriceCondition struct {
+	// 最小価格
+	Min int
+	// 最大価格
+	Max int
+}
+
+func (t *ItemListQuery) ItemListByCondition(ctx context.Context, tx *sql.Tx, condition ItemListCondition) ([]*domain.Item, error) {
 	baseQuery := `
 		SELECT
 			i.id,
@@ -199,7 +229,7 @@ func buildInCondition(field string, idList []string, startIndex int) (string, []
 
 // buildPriceCondition
 // startIndex: $1, $2 などの開始番号
-func buildPriceCondition(price usecase.PriceCondition, startIndex int) (string, []interface{}, int) {
+func buildPriceCondition(price PriceCondition, startIndex int) (string, []interface{}, int) {
 	if price.Min == 0 && price.Max == 0 {
 		return "", nil, startIndex
 	}

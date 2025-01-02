@@ -30,7 +30,7 @@ func TestItemRepository_Read(t *testing.T) {
 	share.ExecSQLFile(t, ctx, "sql/init-read.sql", tx)
 
 	// ここから先は元のテストと同じ
-	repo := infra.NewItemRepositoryImpl()
+	repo := infra.NewItemRepository()
 
 	item, err := repo.Read(ctx, tx, domain.NewItemID("44444444-4444-4444-4444-444444444444"))
 	if err != nil {

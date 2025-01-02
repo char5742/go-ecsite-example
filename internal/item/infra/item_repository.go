@@ -8,17 +8,17 @@ import (
 	"char5742/ecsite-sample/internal/item/domain"
 )
 
-type ItemRepositoryImpl struct {
+type ItemRepository struct {
 }
 
 // インターフェース実装用のコンストラクタ
-func NewItemRepositoryImpl() domain.ItemRepository {
-	return &ItemRepositoryImpl{}
+func NewItemRepository() *ItemRepository {
+	return &ItemRepository{}
 }
 
 // Read は指定された ID の Item を取得します。
 // 指定された ID の Item が存在しない場合は `sql.ErrNoRows` を返却します。
-func (t *ItemRepositoryImpl) Read(ctx context.Context, tx *sql.Tx, id domain.ItemID) (*domain.Item, error) {
+func (t *ItemRepository) Read(ctx context.Context, tx *sql.Tx, id domain.ItemID) (*domain.Item, error) {
 	query := `
 		SELECT
 			items.id,
@@ -64,7 +64,7 @@ func (t *ItemRepositoryImpl) Read(ctx context.Context, tx *sql.Tx, id domain.Ite
 	return &item, nil
 }
 
-func (t *ItemRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, item *domain.Item) error {
+func (t *ItemRepository) Save(ctx context.Context, tx *sql.Tx, item *domain.Item) error {
 	query := `
 		INSERT INTO items (
 			id,
