@@ -17,20 +17,22 @@ DB_NAME := app
 .DEFAULT_GOAL := help
 
 # ビルド
-build:
-	cd docker &&
-	docker build  -t $(APP_NAME):$(DOCKER_TAG) --target deploy .
+# build:
+# 	cd docker && \
+# 	docker build  -t $(APP_NAME):$(DOCKER_TAG) --target deploy .
 
 build-local:
-	cd docker &&
-	docker build  --no-cache
+	cd docker && \
+	docker compose build  --no-cache
 
 # 実行
 run: 
+	cd docker && \
 	docker compose up -d
 
 # 停止
 stop:
+	cd docker && \
 	docker compose down
 
 # テスト実行
