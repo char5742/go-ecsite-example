@@ -1,7 +1,7 @@
 package share
 
 import (
-	"char5742/ecsite-sample/internal/share/infra/db"
+	"char5742/ecsite-sample/pkg/db"
 	"context"
 	"database/sql"
 	"fmt"

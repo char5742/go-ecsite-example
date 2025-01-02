@@ -9,6 +9,7 @@ import (
 	sql "database/sql"
 	reflect "reflect"
 
+	migrate "github.com/golang-migrate/migrate"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -158,4 +159,18 @@ func (m *MockDB) BeginTx(ctx context.Context, opts *sql.TxOptions) (TX, error) {
 func (mr *MockDBMockRecorder) BeginTx(ctx, opts interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BeginTx", reflect.TypeOf((*MockDB)(nil).BeginTx), ctx, opts)
+}
+
+// OpenMigrate mocks base method.
+func (m *MockDB) OpenMigrate(sourceUrl string) *migrate.Migrate {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OpenMigrate", sourceUrl)
+	ret0, _ := ret[0].(*migrate.Migrate)
+	return ret0
+}
+
+// OpenMigrate indicates an expected call of OpenMigrate.
+func (mr *MockDBMockRecorder) OpenMigrate(sourceUrl interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OpenMigrate", reflect.TypeOf((*MockDB)(nil).OpenMigrate), sourceUrl)
 }
