@@ -39,6 +39,10 @@ stop:
 test:
 	go test -race -shuffle=on -coverprofile=coverage.out ./...
 
+# 全てのテストを実行
+test-all:
+	go test --tags=small,medium,large  -race -shuffle=on -coverprofile=coverage.out ./...
+
 # 静的解析
 lint:
 	golangci-lint run
