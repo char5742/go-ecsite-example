@@ -8,6 +8,7 @@ import (
 func NewMux() *http.ServeMux {
 	mux := http.NewServeMux()
 	itemMux := item.NewMux()
-	mux.Handle("/item/", http.StripPrefix("/item", itemMux))
+	mux.Handle("/", itemMux)
+
 	return mux
 }
