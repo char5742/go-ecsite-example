@@ -40,8 +40,6 @@ func TestItemListHandler_Handler(t *testing.T) {
 
 	mockQuery.EXPECT().ItemList(gomock.Any(), gomock.Any()).Return(items, nil)
 	mockDB.EXPECT().BeginTx(gomock.Any(), gomock.Any()).Return(mockTX, nil)
-	mockTX.EXPECT().Commit().Return(nil)
-
 	req, err := http.NewRequest("GET", "/items", nil)
 	assert.NoError(t, err)
 
