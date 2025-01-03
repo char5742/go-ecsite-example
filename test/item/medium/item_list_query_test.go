@@ -6,6 +6,7 @@ import (
 	"context"
 	"testing"
 
+	app "char5742/ecsite-sample/internal/app/infra"
 	"char5742/ecsite-sample/internal/item/infra"
 	"char5742/ecsite-sample/test/share"
 )
@@ -69,6 +70,10 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Min: 0,
 				Max: 15000,
 			},
+			Pagination: app.Pagination{
+				CurrentPage: 1,
+				PerPage:     10,
+			},
 		}
 		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
@@ -93,6 +98,10 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 15000,
+			},
+			Pagination: app.Pagination{
+				CurrentPage: 1,
+				PerPage:     10,
 			},
 		}
 		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
@@ -120,6 +129,10 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Min: 0,
 				Max: 40000,
 			},
+			Pagination: app.Pagination{
+				CurrentPage: 1,
+				PerPage:     10,
+			},
 		}
 		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
@@ -145,6 +158,10 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 15000,
+			},
+			Pagination: app.Pagination{
+				CurrentPage: 1,
+				PerPage:     10,
 			},
 		}
 		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
@@ -172,6 +189,10 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Min: 0,
 				Max: 10000,
 			},
+			Pagination: app.Pagination{
+				CurrentPage: 1,
+				PerPage:     10,
+			},
 		}
 		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
@@ -198,6 +219,10 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 				Min: 0,
 				Max: 10000,
 			},
+			Pagination: app.Pagination{
+				CurrentPage: 1,
+				PerPage:     10,
+			},
 		}
 		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)
 		if err != nil {
@@ -223,6 +248,10 @@ func TestItemListQueryImpl_ItemListByCondition(t *testing.T) {
 			PriceCond: &infra.PriceCondition{
 				Min: 0,
 				Max: 99999,
+			},
+			Pagination: app.Pagination{
+				CurrentPage: 1,
+				PerPage:     10,
 			},
 		}
 		items, err := itemListQuery.ItemListByCondition(ctx, tx, cond)

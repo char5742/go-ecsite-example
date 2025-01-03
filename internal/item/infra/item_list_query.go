@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"char5742/ecsite-sample/internal/app/infra"
 	"char5742/ecsite-sample/internal/item/domain"
 	"char5742/ecsite-sample/pkg/db"
 )
@@ -92,6 +93,8 @@ type ItemListCondition struct {
 	ColorCond *ColorCondition
 	// 価格
 	PriceCond *PriceCondition
+	// ページネーション
+	infra.Pagination
 }
 
 type GenderCondition struct {
@@ -147,7 +150,9 @@ func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx db.TX, c
 	// Gender
 	if condition.GenderCond != nil && len(condition.GenderCond.GenderIDList) > 0 {
 		q, a, newIndex := buildInCondition("i.gender_id", condition.GenderCond.GenderIDList, placeHolderIndex)
-		conds = append(conds, q)
+		if q != "" {
+			conds = append(conds, q)
+		}
 		args = append(args, a...)
 		placeHolderIndex = newIndex
 	}
@@ -155,7 +160,9 @@ func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx db.TX, c
 	// Breed
 	if condition.BreedCond != nil && len(condition.BreedCond.BreedIDList) > 0 {
 		q, a, newIndex := buildInCondition("i.breed_id", condition.BreedCond.BreedIDList, placeHolderIndex)
-		conds = append(conds, q)
+		if q != "" {
+			conds = append(conds, q)
+		}
 		args = append(args, a...)
 		placeHolderIndex = newIndex
 	}
@@ -163,17 +170,22 @@ func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx db.TX, c
 	// Color
 	if condition.ColorCond != nil && len(condition.ColorCond.ColorIDList) > 0 {
 		q, a, newIndex := buildInCondition("i.color_id", condition.ColorCond.ColorIDList, placeHolderIndex)
-		conds = append(conds, q)
+		if q != "" {
+			conds = append(conds, q)
+		}
 		args = append(args, a...)
 		placeHolderIndex = newIndex
 	}
 
 	// Price
 	if condition.PriceCond != nil {
-		q, a, _ := buildPriceCondition(*condition.PriceCond, placeHolderIndex)
+		q, a, newIndex := buildPriceCondition(*condition.PriceCond, placeHolderIndex)
 		if q != "" {
-			conds = append(conds, q)
+			if q != "" {
+				conds = append(conds, q)
+			}
 			args = append(args, a...)
+			placeHolderIndex = newIndex
 		}
 	}
 
@@ -182,9 +194,17 @@ func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx db.TX, c
 		baseQuery += " AND " + strings.Join(conds, " AND ")
 	}
 
+	// ページネーション
+	limit := placeHolderIndex
+	placeHolderIndex++
+	offset := placeHolderIndex
+	placeHolderIndex++
+	baseQuery += fmt.Sprintf(" LIMIT $%d OFFSET $%d", limit, offset)
+	args = append(args, condition.Limit(), condition.Offset())
+
 	rows, err := tx.QueryContext(ctx, baseQuery, args...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to execute query: query=%s, args=%v, err=%w", baseQuery, args, err)
 	}
 	defer rows.Close()
 
@@ -211,7 +231,7 @@ func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx db.TX, c
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to scan rows: query=%s, args=%v, err=%w", baseQuery, args, err)
 	}
 	return items, nil
 }
@@ -221,16 +241,20 @@ func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx db.TX, c
 // idList: IN (...) でバインドするIDリスト
 // startIndex: $1, $2 などの開始番号
 func buildInCondition(field string, idList []string, startIndex int) (string, []interface{}, int) {
-	if len(idList) == 0 {
-		return "", nil, startIndex
-	}
-	placeholders := make([]string, len(idList))
-	args := make([]interface{}, 0, len(idList))
+	placeholders := []string{}
+	args := []interface{}{}
 
-	for i, id := range idList {
-		placeholders[i] = fmt.Sprintf("$%d", startIndex)
+	for _, id := range idList {
+		if id == "" {
+			continue
+		}
+		placeholders = append(placeholders, fmt.Sprintf("$%d", startIndex))
 		args = append(args, id)
 		startIndex++
+	}
+
+	if len(placeholders) == 0 {
+		return "", nil, startIndex
 	}
 
 	query := fmt.Sprintf("%s IN (%s)", field, strings.Join(placeholders, ","))
