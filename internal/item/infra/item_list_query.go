@@ -86,13 +86,13 @@ func (t *ItemListQueryImpl) ItemList(ctx context.Context, tx db.TX) ([]domain.It
 // 商品一覧取得条件
 type ItemListCondition struct {
 	// 性別
-	GenderCond *GenderCondition
+	GenderCond GenderCondition
 	// 種別
-	BreedCond *BreedCondition
+	BreedCond BreedCondition
 	// 色
-	ColorCond *ColorCondition
+	ColorCond ColorCondition
 	// 価格
-	PriceCond *PriceCondition
+	PriceCond PriceCondition
 	// ページネーション
 	infra.Pagination
 }
@@ -113,7 +113,8 @@ type PriceCondition struct {
 	// 最小価格
 	Min int
 	// 最大価格
-	Max int
+	Max   int
+	Valid bool // PriceConditionが有効かどうか
 }
 
 func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx db.TX, condition ItemListCondition) ([]domain.Item, error) {
@@ -148,38 +149,31 @@ func (t *ItemListQueryImpl) ItemListByCondition(ctx context.Context, tx db.TX, c
 	placeHolderIndex := 1
 
 	// Gender
-	if condition.GenderCond != nil && len(condition.GenderCond.GenderIDList) > 0 {
-		q, a, newIndex := buildInCondition("i.gender_id", condition.GenderCond.GenderIDList, placeHolderIndex)
-		if q != "" {
-			conds = append(conds, q)
-		}
-		args = append(args, a...)
-		placeHolderIndex = newIndex
+	q, a, newIndex := buildInCondition("i.gender_id", condition.GenderCond.GenderIDList, placeHolderIndex)
+	if q != "" {
+		conds = append(conds, q)
 	}
+	args = append(args, a...)
+	placeHolderIndex = newIndex
 
 	// Breed
-	if condition.BreedCond != nil && len(condition.BreedCond.BreedIDList) > 0 {
-		q, a, newIndex := buildInCondition("i.breed_id", condition.BreedCond.BreedIDList, placeHolderIndex)
-		if q != "" {
-			conds = append(conds, q)
-		}
-		args = append(args, a...)
-		placeHolderIndex = newIndex
+	q, a, newIndex = buildInCondition("i.breed_id", condition.BreedCond.BreedIDList, placeHolderIndex)
+	if q != "" {
+		conds = append(conds, q)
 	}
+	args = append(args, a...)
+	placeHolderIndex = newIndex
 
 	// Color
-	if condition.ColorCond != nil && len(condition.ColorCond.ColorIDList) > 0 {
-		q, a, newIndex := buildInCondition("i.color_id", condition.ColorCond.ColorIDList, placeHolderIndex)
-		if q != "" {
-			conds = append(conds, q)
-		}
-		args = append(args, a...)
-		placeHolderIndex = newIndex
+	q, a, newIndex = buildInCondition("i.color_id", condition.ColorCond.ColorIDList, placeHolderIndex)
+	if q != "" {
+		conds = append(conds, q)
 	}
-
+	args = append(args, a...)
+	placeHolderIndex = newIndex
 	// Price
-	if condition.PriceCond != nil {
-		q, a, newIndex := buildPriceCondition(*condition.PriceCond, placeHolderIndex)
+	if condition.PriceCond.Valid {
+		q, a, newIndex := buildPriceCondition(condition.PriceCond, placeHolderIndex)
 		if q != "" {
 			if q != "" {
 				conds = append(conds, q)

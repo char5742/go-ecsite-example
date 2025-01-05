@@ -43,14 +43,15 @@ func (h *ItemListSearchHandlerImpl) Handler(w http.ResponseWriter, r *http.Reque
 	fmt.Printf("query: %v", query)
 
 	condition := infra.ItemListCondition{
-		PriceCond: &infra.PriceCondition{
-			Min: query.Search.MinPrice,
-			Max: query.Search.MaxPrice,
+		PriceCond: infra.PriceCondition{
+			Min:   query.Search.MinPrice,
+			Max:   query.Search.MaxPrice,
+			Valid: true,
 		},
-		ColorCond: &infra.ColorCondition{
+		ColorCond: infra.ColorCondition{
 			ColorIDList: query.Search.ColorList,
 		},
-		BreedCond: &infra.BreedCondition{
+		BreedCond: infra.BreedCondition{
 			BreedIDList: []string{query.Search.Breed},
 		},
 		Pagination: app.Pagination{
