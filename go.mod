@@ -4,7 +4,7 @@ go 1.22.0
 
 toolchain go1.23.4
 
-require golang.org/x/sync v0.10.0
+require golang.org/x/sync v0.11.0
 
 require (
 	github.com/caarlos0/env/v11 v11.3.1
