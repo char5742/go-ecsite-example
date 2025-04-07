@@ -1,10 +1,9 @@
 module char5742/ecsite-sample
 
 go 1.22.0
+toolchain go1.24.1
 
-toolchain go1.23.4
-
-require golang.org/x/sync v0.10.0
+require golang.org/x/sync v0.13.0
 
 require (
 	github.com/caarlos0/env/v11 v11.3.1
